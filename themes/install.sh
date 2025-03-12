@@ -9,6 +9,7 @@ source "${REPO_DIR}/gtkrc.sh"
 
 ROOT_UID=0
 DEST_DIR=
+NONINTERACTIVE="false"
 
 ctype=
 
@@ -43,7 +44,7 @@ if [[ "$(command -v gnome-shell)" ]]; then
 		GS_VERSION="3-28"
 	fi
 else
-	echo "'gnome-shell' not found, using styles for last gnome-shell version available."
+	#echo "'gnome-shell' not found, using styles for last gnome-shell version available."
 	GS_VERSION="47-0"
 fi
 
@@ -66,6 +67,8 @@ OPTIONS:
 
   -r, --remove,
   -u, --uninstall         Uninstall/Remove installed themes or links
+
+  -y, --yes				  Non interactive install
 
   --tweaks                Specify versions for tweaks
                           1. [moon|storm]	Moon|Storm| ColorSchemes version
@@ -211,6 +214,10 @@ while [[ $# -gt 0 ]]; do
 		;;
 	-l | --libadwaita)
 		libadwaita="true"
+		shift
+		;;
+	-y | --yes)
+		NONINTERACTIVE="true"
 		shift
 		;;
 	-c | --color)
@@ -406,7 +413,12 @@ install_package() {
 		if has_command zypper; then
 			sudo zypper in sassc
 		elif has_command apt-get; then
-			sudo apt-get install sassc
+			if [[ "$NONINTERACTIVE" == 'true' ]]; then
+				sudo apt-get install -y sassc
+			else
+				sudo apt-get install sassc
+			fi
+			
 		elif has_command dnf; then
 			sudo dnf install sassc
 		elif has_command dnf; then
